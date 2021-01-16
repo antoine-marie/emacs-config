@@ -1,0 +1,311 @@
+#+TITLE: Antoine's emacs config
+#+STARTUP: overview
+* Theme
+  #+begin_src emacs-lisp
+    (use-package doom-themes
+      :ensure t
+      :config
+      ;; Global settings (defaults)
+      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
+      (load-theme 'doom-acario-dark t)  ;;other cool themes doom-zenburn doom-gruvbox
+
+      ;; Enable flashing mode-line on errors
+      (doom-themes-visual-bell-config)
+
+      ;; Corrects (and improves) org-mode's native fontification.
+      (doom-themes-org-config))
+  #+end_src
+* Lexical binding
+  #+begin_src emacs-lisp
+    (setq lexical-binding t)
+  #+end_src
+* User friendly and good looking emacs
+** General looking
+  #+begin_src emacs-lisp
+    (tool-bar-mode -1)
+    (menu-bar-mode -1) 
+    (scroll-bar-mode -1)
+    (toggle-frame-maximized)
+    (global-display-line-numbers-mode t)
+    (setq inhibit-startup-message 't)
+  #+end_src
+** Smooth scrolling
+  #+begin_src emacs-lisp
+  (setq scroll-conservatively 100)
+  #+end_src
+** Easily find cursor
+*** Highlight cursor line
+  #+begin_src emacs-lisp
+    (when window-system (global-hl-line-mode t))
+  #+end_src  
+*** Flashing cursor line (beacon package)
+   #+begin_src emacs-lisp
+     (use-package beacon
+       :ensure t
+       :init
+       (beacon-mode 1))
+   #+end_src
+** Highligh indent package
+   #+begin_src emacs-lisp
+     (use-package highlight-indent-guides
+	    :ensure t
+	    :hook (prog-mode . highlight-indent-guides-mode)
+	    (TeX-mode . highlight-indent-guides-mode))
+     (setq highlight-indent-guides-method 'column)
+   #+end_src
+** Easy bracket parentheses etc 
+*** Rainbow package
+   #+begin_src emacs-lisp
+     (use-package rainbow-delimiters
+       :ensure t
+       :hook (prog-mode . rainbow-delimiters-mode)
+             (TeX-mode . rainbow-delimiters-mode))
+   #+end_src
+*** electric-pair mode
+   #+begin_src emacs-lisp
+     (electric-pair-mode 1)
+   #+end_src
+*** highlight matching bracket
+    #+begin_src emacs-lisp
+      (show-paren-mode 1)
+      (setq show-paren-style 'parenthesis)
+    #+end_src
+** Which-key package
+   #+begin_src emacs-lisp
+     (use-package which-key
+     :ensure t
+     :init
+     (which-key-mode))
+   #+end_src
+** ivy package for auto-completion
+   #+begin_src emacs-lisp
+     (use-package counsel
+       :ensure t
+       :init (ivy-mode 1)
+       :config
+       (setq ivy-use-virtual-buffers t)
+       (setq enable-recursive-minibuffers t)
+       ;; enable this if you want `swiper' to use it
+       ;; (setq search-default-mode #'char-fold-to-regexp)
+       (global-set-key "\C-s" 'swiper)
+       (global-set-key (kbd "C-c C-r") 'ivy-resume)
+       (global-set-key (kbd "<f6>") 'ivy-resume)
+       (global-set-key (kbd "M-x") 'counsel-M-x)
+       (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+       (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+       (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+       (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+       (global-set-key (kbd "<f1> l") 'counsel-find-library)
+       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+       (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+       (global-set-key (kbd "C-c g") 'counsel-git)
+       (global-set-key (kbd "C-c j") 'counsel-git-grep)
+       (global-set-key (kbd "C-c k") 'counsel-ag)
+       (global-set-key (kbd "C-x l") 'counsel-locate)
+       (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+       (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+   #+end_src
+** Company
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    :init
+    (add-hook 'after-init-hook 'global-company-mode))
+
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous))
+#+end_src
+** Avy package
+   #+begin_src emacs-lisp
+     (use-package avy
+     :ensure t)
+     (global-set-key (kbd "C-:") 'avy-goto-char)
+     (global-set-key (kbd "C-!") 'avy-goto-char-2)
+   #+end_src
+** Startup screen = todo list
+   #+begin_src emacs-lisp
+     (setq initial-buffer-choice "/home/antoinem/Org/todo.org")
+   #+end_src
+** Yes or no alias
+  #+begin_src emacs-lisp
+    (defalias 'yes-or-no-p 'y-or-n-p)
+  #+end_src
+** popup kill ring
+   #+begin_src emacs-lisp
+     (use-package popup-kill-ring
+       :ensure t
+       :bind ("M-y" . popup-kill-ring))
+   #+end_src
+** Remove the annoying beeps of emacs
+  #+begin_src emacs-lisp
+    (setq ring-bell-function 'ignore)
+  #+end_src
+* PDF tools
+** Install pdftools
+   #+begin_src emacs-lisp
+     (use-package pdf-tools
+       :ensure t
+       :config (pdf-tools-install)
+       :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
+   #+end_src
+
+* Org
+** General looking
+*** Org bullets
+   #+begin_src emacs-lisp
+     (use-package org-bullets
+       :ensure t
+       :hook (org-mode . (lambda () (org-bullets-mode))))
+   #+end_src
+*** Indent mode
+    #+begin_src emacs-lisp
+      (add-hook 'org-mode-hook 'org-indent-mode)
+    #+end_src
+*** Do not show markers for italics, bold etc
+#+begin_src emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+end_src
+** Visual line mode
+   #+begin_src emacs-lisp
+     (add-hook 'org-mode-hook '(lambda () (visual-line-mode 1)))
+   #+end_src
+** Agenda
+*** set agenda key
+   #+begin_src emacs-lisp
+      (global-set-key (kbd "C-c a") 'org-agenda)
+   #+end_src
+*** set agenda file
+    #+begin_src emacs-lisp
+      (setq org-agenda-files (quote ("/home/antoinem/Org/todo.org")))
+    #+end_src
+*** compact agenda
+#+begin_src emacs-lisp
+  ;; Do not dim blocked tasks
+  (setq org-agenda-dim-blocked-tasks nil)
+  ;; Compact the block agenda view
+  (setq org-agenda-compact-blocks t)
+#+end_src
+*** start agenda from today
+#+begin_src emacs-lisp
+  (setq org-agenda-span 10
+        org-agenda-start-on-weekday nil
+        org-agenda-start-day "-3d")
+#+end_src
+** Org TODO keywords and priorities
+   #+begin_src emacs-lisp
+     (setq org-todo-keywords
+	   '(
+	     (sequence "IDEA(i)" "TODO(t)" "WAITING(w)" "MEETING(m)" "|" "DONE(d)")
+	     (sequence "|" "CANCELED(c)" "SOMEDAY(f)")
+	     ))
+
+     (setq org-todo-keyword-faces
+	   '(("IDEA" . (:foreground "GoldenRod" :weight bold))
+	     ("NEXT" . (:foreground "IndianRed1" :weight bold))
+	     ("MEETING" . (:foreground "OrangeRed" :weight bold))
+	     ("WAITING" . (:foreground "coral" :weight bold))
+	     ("CANCELED" . (:foreground "LimeGreen" :weight bold))
+	     ("DELEGATED" . (:foreground "LimeGreen" :weight bold))
+	     ("SOMEDAY" . (:foreground "LimeGreen" :weight bold))
+	     ))
+     (setq org-highest-priority ?A)
+	  (setq org-lowest-priority ?C)
+	  (setq org-default-priority ?A)
+	  (setq org-priority-faces '((?A . (:foreground "red" :weight bold))
+				     (?B . (:foreground "orange" :weight bold))
+				     (?C . (:foreground "yellow" :weight bold))))
+   #+end_src
+** Org capture template
+*** set key template
+    #+begin_src emacs-lisp
+      (define-key global-map (kbd "C-c c") 'org-capture)
+    #+end_src
+*** todo template
+    #+begin_src emacs-lisp
+      (setq org-capture-templates
+	    '(("t" "todo" entry (file+headline "~/Org/todo.org" "Tasks")
+	       "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")))
+    #+end_src
+*** idea template
+    #+begin_src emacs-lisp
+      (setq org-capture-templates
+	    '(("i" "Idea" entry (file+headline "~/Org/todo.org" "Task")
+	       "* IDEA %?\nAdded: %U\n" :prepend t :kill-buffer t)))
+    #+end_src
+* AucTeX
+** install
+   #+begin_src emacs-lisp
+     (use-package tex
+         :ensure auctex
+         :config
+         (setq TeX-auto-save t)
+         (setq TeX-parse-self t))         
+   #+end_src
+
+** auctex-latexmk
+   #+begin_src emacs-lisp
+     (use-package auctex-latexmk
+       :ensure t
+       :init
+       (auctex-latexmk-setup))
+   #+end_src
+   
+** PDF updated and open in PDF tools
+   #+begin_src emacs-lisp
+     ;; to use pdfview with auctex
+     (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+     TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
+     ;; to have the buffer refresh after compilation
+     (add-hook 'TeX-after-compilation-finished-functions
+	 #'TeX-revert-document-buffer)
+     ;;correlate
+     (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+   #+end_src
+
+** reftex
+#+begin_src emacs-lisp
+  (add-hook 'LaTeX-mode-hook 'reftex-mode)
+  (setq reftex-plug-into-AUCTeX t)
+#+end_src
+** company
+#+begin_src emacs-lisp
+   (use-package company-reftex
+    :ensure t
+    :config
+    (require 'company)
+    (add-to-list 'company-backends 'company-reftex-labels)
+    (add-to-list 'company-backends 'company-reftex-citations))
+
+  (use-package company-math
+    :ensure t
+    :config
+    (require 'company)
+    (add-to-list 'company-backends 'company-math-symbols-latex)
+    (add-to-list 'company-backends 'company-math-symbols-unicode))
+
+  (use-package company-auctex
+    :ensure t
+    :init  (company-auctex-init))
+#+end_src
+** Default prefix labels
+#+begin_src emacs-lisp :tangle init.el
+(setq-default LaTeX-equation-label "eq:")
+(setq-default LaTeX-eqnarray-label "eq:")
+(setq-default LaTeX-amsmath-label "eq:")
+(setq-default LaTeX-float "h")
+(setq-default LaTeX-figure-label "fig:")
+(setq-default LaTeX-table-label "tab:")
+#+end_src
+** flyspell
+#+begin_src emacs-lisp
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode) 
+#+end_src
+
+

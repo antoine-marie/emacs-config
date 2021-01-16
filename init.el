@@ -1,0 +1,6 @@
+(setq-default LaTeX-equation-label "eq:")
+(setq-default LaTeX-eqnarray-label "eq:")
+(setq-default LaTeX-amsmath-label "eq:")
+(setq-default LaTeX-float "h")
+(setq-default LaTeX-figure-label "fig:")
+(setq-default LaTeX-table-label "tab:")
