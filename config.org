@@ -16,11 +16,7 @@
       ;; Corrects (and improves) org-mode's native fontification.
       (doom-themes-org-config))
   #+end_src
-* Lexical binding
-  #+begin_src emacs-lisp
-    (setq lexical-binding t)
-  #+end_src
-* User friendly and good looking emacs
+* Good looking emacs
 ** General looking
   #+begin_src emacs-lisp
     (tool-bar-mode -1)
@@ -29,6 +25,12 @@
     (toggle-frame-maximized)
     (global-display-line-numbers-mode t)
     (setq inhibit-startup-message 't)
+    (setq org-hide-emphasis-markers nil) ;; to hide the *,=, or / markers
+    (defalias 'yes-or-no-p 'y-or-n-p)
+  #+end_src
+** Remove the annoying beeps of emacs
+  #+begin_src emacs-lisp
+    (setq ring-bell-function 'ignore)
   #+end_src
 ** Smooth scrolling
   #+begin_src emacs-lisp
@@ -55,7 +57,7 @@
      (setq highlight-indent-guides-method 'column)
    #+end_src
 ** Easy bracket parentheses etc 
-*** Rainbow package
+*** Rainbow-delimiters package
    #+begin_src emacs-lisp
      (use-package rainbow-delimiters
        :ensure t
@@ -71,6 +73,42 @@
       (show-paren-mode 1)
       (setq show-paren-style 'parenthesis)
     #+end_src
+** UTF-8 encoding
+#+begin_src emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+#+end_src
+** PDF tools
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    :config (pdf-tools-install)
+    :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
+#+end_src
+** Startup screen
+#+begin_src emacs-lisp
+     (setq initial-buffer-choice "/home/antoinem/Org/todo.org")
+#+end_src
+** Diminish
+#+begin_src emacs-lisp
+  (use-package diminish
+    :ensure t
+    :init
+    (diminish 'which-key-mode)
+    (diminish 'visual-line-mode)
+    (diminish 'beacon-mode)
+    (diminish 'rainbow-delimiters-mode)
+    (diminish 'flycheck-mode))
+#+end_src
+* User friendly emacs
+** Backups
+#+begin_src emacs-lisp
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+#+end_src
 ** Which-key package
    #+begin_src emacs-lisp
      (use-package which-key
@@ -78,6 +116,33 @@
      :init
      (which-key-mode))
    #+end_src
+** Company
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 3)
+    :init
+    (add-hook 'after-init-hook 'global-company-mode))
+
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous))
+#+end_src
+** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t)
+#+end_src
+** popup kill ring
+   #+begin_src emacs-lisp
+     (use-package popup-kill-ring
+       :ensure t
+       :bind ("M-y" . popup-kill-ring))
+   #+end_src  
 ** ivy package for auto-completion
    #+begin_src emacs-lisp
      (use-package counsel
@@ -106,22 +171,6 @@
        (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
    #+end_src
-** Company
-#+begin_src emacs-lisp
-  (use-package company
-    :ensure t
-    :config
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 3)
-    :init
-    (add-hook 'after-init-hook 'global-company-mode))
-
-  (with-eval-after-load 'company
-    (define-key company-active-map (kbd "M-n") nil)
-    (define-key company-active-map (kbd "M-p") nil)
-    (define-key company-active-map (kbd "C-n") #'company-select-next)
-    (define-key company-active-map (kbd "C-p") #'company-select-previous))
-#+end_src
 ** Avy package
    #+begin_src emacs-lisp
      (use-package avy
@@ -129,33 +178,6 @@
      (global-set-key (kbd "C-:") 'avy-goto-char)
      (global-set-key (kbd "C-!") 'avy-goto-char-2)
    #+end_src
-** Startup screen = todo list
-   #+begin_src emacs-lisp
-     (setq initial-buffer-choice "/home/antoinem/Org/todo.org")
-   #+end_src
-** Yes or no alias
-  #+begin_src emacs-lisp
-    (defalias 'yes-or-no-p 'y-or-n-p)
-  #+end_src
-** popup kill ring
-   #+begin_src emacs-lisp
-     (use-package popup-kill-ring
-       :ensure t
-       :bind ("M-y" . popup-kill-ring))
-   #+end_src
-** Remove the annoying beeps of emacs
-  #+begin_src emacs-lisp
-    (setq ring-bell-function 'ignore)
-  #+end_src
-* PDF tools
-** Install pdftools
-   #+begin_src emacs-lisp
-     (use-package pdf-tools
-       :ensure t
-       :config (pdf-tools-install)
-       :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
-   #+end_src
-
 * Org
 ** General looking
 *** Org bullets
@@ -239,16 +261,43 @@
 	    '(("i" "Idea" entry (file+headline "~/Org/todo.org" "Task")
 	       "* IDEA %?\nAdded: %U\n" :prepend t :kill-buffer t)))
     #+end_src
+*** elisp-template
+#+begin_src emacs-lisp
+  (add-to-list 'org-structure-template-alist
+                 '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")) 
+#+end_src
 * AucTeX
 ** install
    #+begin_src emacs-lisp
-     (use-package tex
-         :ensure auctex
-         :config
-         (setq TeX-auto-save t)
-         (setq TeX-parse-self t))         
+     (use-package auctex
+       :ensure t
+       :mode ("\\.tex\\'" . TeX-latex-mode)
+       :config
+       ;; General configs
+       (setq TeX-master		 nil
+             TeX-auto-save		 t
+             TeX-parse-self		 t
+             TeX-PDF-mode		 t
+             TeX-electric-escape	 t)
+       ;; Turn on RefTeX in AUCTeX
+       (setq reftex-plug-into-AUCTeX t)
+       (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+       ;; Reftex default bibfile
+       ;;(setq reftex-default-bibliography "~/Stage_M2/ESVCC/VpCCD/VpCCD.bib")
+       ;; Activate nice interface between RefTeX and AUCTeX
+       (setq reftex-plug-into-AUCTeX t)
+       )        
    #+end_src
 
+** company
+#+begin_src emacs-lisp
+  ;; Completion
+  (use-package company-auctex
+    :ensure t
+    :after (company-auctex)
+    :init
+    (company-auctex-init))
+#+end_src
 ** auctex-latexmk
    #+begin_src emacs-lisp
      (use-package auctex-latexmk
@@ -269,43 +318,16 @@
      (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
    #+end_src
 
-** reftex
-#+begin_src emacs-lisp
-  (add-hook 'LaTeX-mode-hook 'reftex-mode)
-  (setq reftex-plug-into-AUCTeX t)
-#+end_src
-** company
-#+begin_src emacs-lisp
-   (use-package company-reftex
-    :ensure t
-    :config
-    (require 'company)
-    (add-to-list 'company-backends 'company-reftex-labels)
-    (add-to-list 'company-backends 'company-reftex-citations))
-
-  (use-package company-math
-    :ensure t
-    :config
-    (require 'company)
-    (add-to-list 'company-backends 'company-math-symbols-latex)
-    (add-to-list 'company-backends 'company-math-symbols-unicode))
-
-  (use-package company-auctex
-    :ensure t
-    :init  (company-auctex-init))
-#+end_src
-** Default prefix labels
-#+begin_src emacs-lisp :tangle init.el
-(setq-default LaTeX-equation-label "eq:")
-(setq-default LaTeX-eqnarray-label "eq:")
-(setq-default LaTeX-amsmath-label "eq:")
-(setq-default LaTeX-float "h")
-(setq-default LaTeX-figure-label "fig:")
-(setq-default LaTeX-table-label "tab:")
-#+end_src
 ** flyspell
 #+begin_src emacs-lisp
   (add-hook 'LaTeX-mode-hook 'flyspell-mode) 
 #+end_src
-
-
+* Magit
+** Magit package
+   #+begin_src emacs-lisp
+     (use-package magit
+       :bind
+       ("C-x g" . magit-status)
+       :config
+       (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+   #+end_src
