@@ -1,6 +1,7 @@
 #+TITLE: Antoine's emacs config
 #+STARTUP: overview
 * Theme
+Loading a nice looking theme
   #+begin_src emacs-lisp
     (use-package doom-themes
       :ensure t
@@ -27,6 +28,9 @@
     (setq inhibit-startup-message 't)
     (setq org-hide-emphasis-markers nil) ;; to hide the *,=, or / markers
     (defalias 'yes-or-no-p 'y-or-n-p)
+    (setq
+         split-width-threshold 0
+         split-height-threshold nil) ;; vertical split by default
   #+end_src
 ** Remove the annoying beeps of emacs
   #+begin_src emacs-lisp
@@ -90,7 +94,7 @@
 #+end_src
 ** Startup screen
 #+begin_src emacs-lisp
-     (setq initial-buffer-choice "/home/antoinem/Org/todo.org")
+     (setq initial-buffer-choice "/home/antoinem/BeepBoop/Org/todo.org")
 #+end_src
 ** Diminish
 #+begin_src emacs-lisp
