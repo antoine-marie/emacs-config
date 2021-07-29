@@ -1,5 +1,12 @@
-#+TITLE: Antoine's emacs config
+#+TITLE: My emacs config
 #+STARTUP: overview
+* Intro
+To create this config, I have mainly used the following tutorial of [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][Uncle Dave]].
+I have also used pieces of other emacs config:
+- [[https://github.com/daedreth/UncleDavesEmacs][https://github.com/daedreth/UncleDavesEmacs]]
+- [[https://github.com/hieutkt/emacs-config][https://github.com/hieutkt/emacs-config]]
+- [[http://pages.sachachua.com/.emacs.d/Sacha.html][http://pages.sachachua.com/.emacs.d/Sacha.html]]
+  
 * Theme
 Loading a nice looking theme
   #+begin_src emacs-lisp
@@ -19,8 +26,9 @@ Loading a nice looking theme
   #+end_src
 * Good looking emacs
 ** General looking
+Setting some general parameters
   #+begin_src emacs-lisp
-    (tool-bar-mode -1)
+    (tool-bar-mode -1) ;; removing useless bars
     (menu-bar-mode -1) 
     (scroll-bar-mode -1)
     (toggle-frame-maximized)
@@ -40,19 +48,8 @@ Loading a nice looking theme
   #+begin_src emacs-lisp
   (setq scroll-conservatively 100)
   #+end_src
-** Easily find cursor
-*** Highlight cursor line
-  #+begin_src emacs-lisp
-    (when window-system (global-hl-line-mode t))
-  #+end_src  
-*** Flashing cursor line (beacon package)
-   #+begin_src emacs-lisp
-     (use-package beacon
-       :ensure t
-       :init
-       (beacon-mode 1))
-   #+end_src
 ** Highligh indent package
+Highlight the indents in the prog and TeX modes.
    #+begin_src emacs-lisp
      (use-package highlight-indent-guides
 	    :ensure t
@@ -62,6 +59,7 @@ Loading a nice looking theme
    #+end_src
 ** Easy bracket parentheses etc 
 *** Rainbow-delimiters package
+Each pairs of delimiters have a given color to make it easier to recognize pairs.
    #+begin_src emacs-lisp
      (use-package rainbow-delimiters
        :ensure t
@@ -69,10 +67,12 @@ Loading a nice looking theme
              (TeX-mode . rainbow-delimiters-mode))
    #+end_src
 *** electric-pair mode
+Minor mode to write the closing delimiters when typing an opening one.
    #+begin_src emacs-lisp
      (electric-pair-mode 1)
    #+end_src
 *** highlight matching bracket
+Highlight the matching delimiters when the cursor is on one of them.
     #+begin_src emacs-lisp
       (show-paren-mode 1)
       (setq show-paren-style 'parenthesis)
@@ -86,6 +86,7 @@ Loading a nice looking theme
   (prefer-coding-system 'utf-8)
 #+end_src
 ** PDF tools
+Use pdf-tools to read pdf within emacs
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :ensure t
@@ -93,19 +94,23 @@ Loading a nice looking theme
     :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
 #+end_src
 ** Startup screen
+Choosing your starting file
 #+begin_src emacs-lisp
      (setq initial-buffer-choice "/home/antoinem/BeepBoop/Org/todo.org")
 #+end_src
 ** Diminish
+Remove all the minor mode in the bottom bar
 #+begin_src emacs-lisp
-  (use-package diminish
-    :ensure t
-    :init
-    (diminish 'which-key-mode)
-    (diminish 'visual-line-mode)
-    (diminish 'beacon-mode)
-    (diminish 'rainbow-delimiters-mode)
-    (diminish 'flycheck-mode))
+      (use-package diminish
+        :ensure t
+        :init
+        (diminish 'which-key-mode)
+        (diminish 'visual-line-mode)
+        (diminish 'beacon-mode)
+        (diminish 'rainbow-delimiters-mode)
+        (diminish 'flycheck-mode)
+        (diminish 'ivy-mode)
+        (diminish 'company-mode))
 #+end_src
 * User friendly emacs
 ** Backups
@@ -114,13 +119,28 @@ Loading a nice looking theme
   (setq auto-save-default nil)
 #+end_src
 ** Which-key package
+Display all the possible commands if you forget the one that you want.
    #+begin_src emacs-lisp
      (use-package which-key
      :ensure t
      :init
      (which-key-mode))
    #+end_src
+** Easily find cursor
+*** Highlight cursor line
+  #+begin_src emacs-lisp
+    (when window-system (global-hl-line-mode t))
+  #+end_src  
+*** Flashing cursor line (beacon package)
+Make the cursor's line flash when switching window or buffer.
+   #+begin_src emacs-lisp
+     (use-package beacon
+       :ensure t
+       :init
+       (beacon-mode 1))
+   #+end_src
 ** Company
+Company provides auto-completion
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
@@ -176,6 +196,7 @@ Loading a nice looking theme
        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
    #+end_src
 ** Avy package
+Avy for fast moving to a character.
    #+begin_src emacs-lisp
      (use-package avy
      :ensure t)
@@ -328,7 +349,9 @@ Loading a nice looking theme
 #+end_src
 * Magit
 ** Magit package
-   #+begin_src emacs-lisp
+Magit is a git porcelain for emacs.
+Reference card for [[https://magit.vc/manual/magit-refcard.pdf][magit]].
+#+begin_src emacs-lisp
      (use-package magit
        :bind
        ("C-x g" . magit-status)
