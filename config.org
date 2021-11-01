@@ -1,12 +1,13 @@
 #+TITLE: My emacs config
 #+STARTUP: overview
 * Intro
-To create this config, I have mainly used the following tutorial of [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][Uncle Dave]].
+To create this config, I have mainly used this tutorial of [[https://www.youtube.com/watch?v=d6iY_1aMzeg&list=PLX2044Ew-UVVv31a0-Qn3dA6Sd_-NyA1n][Uncle Dave]].
 I have also used pieces of other emacs config:
 - [[https://github.com/daedreth/UncleDavesEmacs][https://github.com/daedreth/UncleDavesEmacs]]
 - [[https://github.com/hieutkt/emacs-config][https://github.com/hieutkt/emacs-config]]
 - [[http://pages.sachachua.com/.emacs.d/Sacha.html][http://pages.sachachua.com/.emacs.d/Sacha.html]]
-  
+- https://github.com/daviwil/dotfiles/blob/master/Emacs.org
+
 * Theme
 Loading a nice looking theme
   #+begin_src emacs-lisp
@@ -16,7 +17,7 @@ Loading a nice looking theme
       ;; Global settings (defaults)
       (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
-      (load-theme 'doom-acario-dark t)  ;;other cool themes doom-zenburn doom-gruvbox
+      (load-theme 'doom-snazzy t)  ;;other cool themes doom-acario-dark doom-zenburn doom-gruvbox 
 
       ;; Enable flashing mode-line on errors
       (doom-themes-visual-bell-config)
@@ -24,6 +25,7 @@ Loading a nice looking theme
       ;; Corrects (and improves) org-mode's native fontification.
       (doom-themes-org-config))
   #+end_src
+
 * Good looking emacs
 ** General looking
 Setting some general parameters
@@ -93,11 +95,7 @@ Use pdf-tools to read pdf within emacs
     :config (pdf-tools-install)
     :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
 #+end_src
-** Startup screen
-Choosing your starting file
-#+begin_src emacs-lisp
-     (setq initial-buffer-choice "/home/antoinem/BeepBoop/Org/todo.org")
-#+end_src
+
 ** Diminish
 Remove all the minor mode in the bottom bar
 #+begin_src emacs-lisp
@@ -117,6 +115,10 @@ Remove all the minor mode in the bottom bar
 #+begin_src emacs-lisp
   (setq make-backup-files nil)
   (setq auto-save-default nil)
+#+end_src
+** Config shortcut
+#+begin_src emacs-lisp
+   (global-set-key (kbd "C-c e") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 #+end_src
 ** Which-key package
 Display all the possible commands if you forget the one that you want.
@@ -196,6 +198,7 @@ Company provides auto-completion
        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
    #+end_src
 ** Avy package
+
 Avy for fast moving to a character.
    #+begin_src emacs-lisp
      (use-package avy
@@ -203,7 +206,8 @@ Avy for fast moving to a character.
      (global-set-key (kbd "C-:") 'avy-goto-char)
      (global-set-key (kbd "C-!") 'avy-goto-char-2)
    #+end_src
-* Org
+n* Org
+* Org mode
 ** General looking
 *** Org bullets
    #+begin_src emacs-lisp
@@ -219,18 +223,39 @@ Avy for fast moving to a character.
 #+begin_src emacs-lisp
   (setq org-hide-emphasis-markers t)
 #+end_src
+*** ... -> Drop down character
+#+begin_src emacs-lisp
+  (setq org-ellipsis " ▾")
+#+end_src
+*** Font size of different headers
+#+begin_src emacs-lisp
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1))))
+#+end_src
 ** Visual line mode
    #+begin_src emacs-lisp
      (add-hook 'org-mode-hook '(lambda () (visual-line-mode 1)))
    #+end_src
+
+   #+RESULTS:
+
 ** Agenda
 *** set agenda key
    #+begin_src emacs-lisp
       (global-set-key (kbd "C-c a") 'org-agenda)
    #+end_src
-*** set agenda file
+*** set agenda files
     #+begin_src emacs-lisp
-      (setq org-agenda-files (quote ("/home/antoinem/Org/todo.org")))
+      (setq org-agenda-files '("/home/antoinem/BeepBoop/Org/todo.org"
+                               "/home/antoinem/BeepBoop/Org/work.org"
+                               "/home/antoinem/BeepBoop/Org/anniv.org"
+                               "/home/antoinem/BeepBoop/Org/livres.org"))
     #+end_src
 *** compact agenda
 #+begin_src emacs-lisp
@@ -239,11 +264,22 @@ Avy for fast moving to a character.
   ;; Compact the block agenda view
   (setq org-agenda-compact-blocks t)
 #+end_src
-*** start agenda from today
+*** start agenda f rom today
 #+begin_src emacs-lisp
   (setq org-agenda-span 10
         org-agenda-start-on-weekday nil
         org-agenda-start-day "-3d")
+#+end_src
+*** org-habit
+#+begin_src emacs-lisp
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-graph-column 40)
+#+end_src
+** Key binding for todo.org
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c t") (lambda() (interactive)(find-file "~/BeepBoop/Org/todo.org")))
+  (global-set-key (kbd "C-c w") (lambda() (interactive)(find-file "~/BeepBoop/Org/work.org")))
 #+end_src
 ** Org TODO keywords and priorities
    #+begin_src emacs-lisp
@@ -252,16 +288,6 @@ Avy for fast moving to a character.
 	     (sequence "IDEA(i)" "TODO(t)" "WAITING(w)" "MEETING(m)" "|" "DONE(d)")
 	     (sequence "|" "CANCELED(c)" "SOMEDAY(f)")
 	     ))
-
-     (setq org-todo-keyword-faces
-	   '(("IDEA" . (:foreground "GoldenRod" :weight bold))
-	     ("NEXT" . (:foreground "IndianRed1" :weight bold))
-	     ("MEETING" . (:foreground "OrangeRed" :weight bold))
-	     ("WAITING" . (:foreground "coral" :weight bold))
-	     ("CANCELED" . (:foreground "LimeGreen" :weight bold))
-	     ("DELEGATED" . (:foreground "LimeGreen" :weight bold))
-	     ("SOMEDAY" . (:foreground "LimeGreen" :weight bold))
-	     ))
      (setq org-highest-priority ?A)
 	  (setq org-lowest-priority ?C)
 	  (setq org-default-priority ?A)
@@ -269,7 +295,8 @@ Avy for fast moving to a character.
 				     (?B . (:foreground "orange" :weight bold))
 				     (?C . (:foreground "yellow" :weight bold))))
    #+end_src
-** Org capture template
+
+** TODO Org capture template
 *** set key template
     #+begin_src emacs-lisp
       (define-key global-map (kbd "C-c c") 'org-capture)
@@ -277,19 +304,52 @@ Avy for fast moving to a character.
 *** todo template
     #+begin_src emacs-lisp
       (setq org-capture-templates
-	    '(("t" "todo" entry (file+headline "~/Org/todo.org" "Tasks")
-	       "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")))
+            '(("t" "todo" entry (file+headline "~/BeepBoop/Org/todo.org" "Tasks")
+               "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n"  :prepend t :kill-buffer t)))
     #+end_src
+
 *** idea template
     #+begin_src emacs-lisp
       (setq org-capture-templates
-	    '(("i" "Idea" entry (file+headline "~/Org/todo.org" "Task")
-	       "* IDEA %?\nAdded: %U\n" :prepend t :kill-buffer t)))
+            '(("i" "Idea" entry (file+headline "~/BeepBoop/Org/todo.org" "Task")
+               "* IDEA %?\nAdded: %U\n" :prepend t :kill-buffer t)))
     #+end_src
-*** elisp-template
+    
+** Org structure template
 #+begin_src emacs-lisp
-  (add-to-list 'org-structure-template-alist
-                 '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC")) 
+  (setq org-structure-template-alist
+    '(("a" . "export ascii\n")
+      ("c" . "center\n")
+      ("C" . "comment\n")
+      ("e" . "example\n")
+      ("E" . "export")
+      ("h" . "export html\n")
+      ("l" . "export latex\n")
+      ("q" . "quote\n")
+      ("s" . "src")
+      ("v" . "verse\n")
+      ("el" . "src emacs-lisp\n"))) 
+#+end_src
+
+** Org tags list
+#+begin_src emacs-lisp
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("email" . ?e)
+       ("idea" . ?i)))
+#+end_src
+** TODO org-wild-notifier for notifications for agenda 
+** Host local server with simple-httpd
+#+begin_src emacs-lisp
+  (use-package simple-httpd
+    :ensure t)
 #+end_src
 * AucTeX
 ** install
@@ -347,14 +407,134 @@ Avy for fast moving to a character.
 #+begin_src emacs-lisp
   (add-hook 'LaTeX-mode-hook 'flyspell-mode) 
 #+end_src
+** latex preview
+#+begin_src emacs-lisp
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+#+end_src
+
 * Magit
+Great tutorial to learn the very basics of [[https://www.youtube.com/watch?v=vQO7F2Q9DwA][magit]]. A more advanced series of tutorial on [[https://www.youtube.com/playlist?list=PLEoMzSkcN8oMc34dTjyFmTUWbXTKrNfZA][magit]].
 ** Magit package
 Magit is a git porcelain for emacs.
 Reference card for [[https://magit.vc/manual/magit-refcard.pdf][magit]].
 #+begin_src emacs-lisp
-     (use-package magit
-       :bind
-       ("C-x g" . magit-status)
-       :config
-       (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+  (use-package magit
+    :bind
+    ("C-x g" . magit-status)
+    :config
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package git-gutter
+    :init
+    (global-git-gutter-mode))
+
+  (use-package git-gutter-fringe
+    :after git-gutter)
+#+end_src
+* Org roam
+I learned how to use org roam thanks to the following [[https://www.youtube.com/watch?v=AyhPmypHDEw&list=PLEoMzSkcN8oN3x3XaZQ-AXFKv52LZzjqD][series of tutorial]].
+There is also a complete tutorial on how to install the minimum configuration for org-roam-bibtex [[https://org-roam.discourse.group/t/minimum-configuration-of-org-roam-v2-org-roam-bibtex-for-spacemacs-users/1755][here]].
+** Load package
+#+begin_src emacs-lisp
+      (use-package org-roam
+        :ensure t
+        :init
+        (setq org-roam-v2-ack t)
+        (setq org-roam-completion-everywhere t)
+        :custom
+        (org-roam-directory "~/BeepBoop/OrgRoam")
+        :bind (("C-c n l" . org-roam-buffer-toggle)
+               ("C-c n f" . org-roam-node-find)
+               ("C-c n g" . org-roam-graph)
+               ("C-c n i" . org-roam-node-insert)
+               ("C-c n c" . org-roam-capture)
+               ;; Dailies
+               ("C-c n j" . org-roam-dailies-capture-today)
+               :map org-mode-map
+               ("C-M-i" . completion-at-point))
+        :config
+        (org-roam-setup))
+#+end_src
+** Size org roam buffer
+#+begin_src emacs-lisp
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+#+end_src
+** Capture templates
+#+begin_src emacs-lisp
+  (setq org-roam-capture-templates
+              '(("e" "empty" plain "%?"
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("a" "notes on a research article" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Article.org")
+                 :if-new (file+head "${citekey}.org" "#+title: ${citekey}\n")
+                 :unnarrowed t)
+                ("m" "notes on a method" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Method.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("d" "definition or notes on a concept" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Definition_Concept.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("g" "general category to link other notes" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/General_category.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("t" "notes on a textbook" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Textbook.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("l" "notes on lecture (notes)" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/LectureNotes.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("p" "notes on a PhD manuscript" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/PhD.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)
+                ("c" "notes on a conference" plain
+                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Conference.org")
+                 :if-new (file+head "${slug}.org" "#+title: ${title}\n")
+                 :unnarrowed t)))
+#+end_src
+
+** TODO [#C] Advanced configuration ivy-bibtex
+https://github.com/tmalsburg/helm-bibtex
+   #+begin_src emacs-lisp
+     (use-package ivy-bibtex
+       :ensure t
+       )
+     (setq bibtex-completion-bibliography
+           '("/home/antoinem/References/References.bib")
+           bibtex-completion-notes-path "/home/antoinem/BeepBoop/Org/bibtex_notes.org"
+           bibtex-completion-library-path '("/home/antoinem/References")
+           bibtex-completion-pdf-field "file")
+     (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
    #+end_src
+** Org-ref
+#+begin_src emacs-lisp
+  (use-package org-ref
+    :ensure t
+  )
+  (setq org-ref-bibliography-notes "/home/antoinem/BeepBoop/Org/ref_notes.org"
+        org-ref-default-bibliography '("/home/antoinem/References/References.bib")
+        org-ref-pdf-directory "/home/antoinem/References")
+#+end_src
+** Org-roam-bibtex
+#+begin_src emacs-lisp
+    ;; If you installed via MELPA
+  (use-package org-roam-bibtex
+    :after org-roam
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :bind (:map org-mode-map
+                (("C-c n a" . orb-note-actions))))
+  (setq orb-preformat-keywords '("citekey" "author" "year" "doi" "journal" "file"))
+#+end_src

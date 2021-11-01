@@ -29,7 +29,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(git-gutter-fringe git-gutter magit company-auctex popup-kill-ring doom-themes zenburn-theme rainbow-delimiters auctex-latexmk avy org-bullets beacon darkburn-theme which-key use-package)))
+   '(simple-httpd org-roam-bibtex git-gutter-fringe git-gutter magit company-auctex popup-kill-ring doom-themes zenburn-theme rainbow-delimiters auctex-latexmk avy org-bullets beacon darkburn-theme which-key use-package)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
