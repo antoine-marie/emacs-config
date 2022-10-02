@@ -17,7 +17,7 @@ Loading a nice looking theme
       ;; Global settings (defaults)
       (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
-      (load-theme 'doom-snazzy t)  ;;other cool themes doom-acario-dark doom-zenburn doom-gruvbox 
+      (load-theme 'doom-molokai t)  ;;other cool themes doom-acario-dark doom-zenburn doom-gruvbox doom-snazzy doom-material
 
       ;; Enable flashing mode-line on errors
       (doom-themes-visual-bell-config)
@@ -42,6 +42,9 @@ Setting some general parameters
          split-width-threshold 0
          split-height-threshold nil) ;; vertical split by default
   #+end_src
+
+  #+RESULTS:
+
 ** Remove the annoying beeps of emacs
   #+begin_src emacs-lisp
     (setq ring-bell-function 'ignore)
@@ -72,6 +75,9 @@ Each pairs of delimiters have a given color to make it easier to recognize pairs
 Minor mode to write the closing delimiters when typing an opening one.
    #+begin_src emacs-lisp
      (electric-pair-mode 1)
+     (add-hook 'LaTeX-mode-hook
+               '(lambda ()
+                 (define-key LaTeX-mode-map (kbd "$") 'self-insert-command)))
    #+end_src
 *** highlight matching bracket
 Highlight the matching delimiters when the cursor is on one of them.
@@ -92,7 +98,7 @@ Use pdf-tools to read pdf within emacs
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :ensure t
-    :config (pdf-tools-install)
+    ;; :config (pdf-tools-install)
     :hook (pdf-view-mode . (lambda () (display-line-numbers-mode -1) (pdf-sync-minor-mode 1))))
 #+end_src
 
@@ -198,15 +204,41 @@ Company provides auto-completion
        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
    #+end_src
 ** Avy package
-
 Avy for fast moving to a character.
+
    #+begin_src emacs-lisp
      (use-package avy
      :ensure t)
      (global-set-key (kbd "C-:") 'avy-goto-char)
      (global-set-key (kbd "C-!") 'avy-goto-char-2)
    #+end_src
-n* Org
+
+** recentf-mode
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+  (global-set-key (kbd "C-x r") 'recentf-open-files)
+#+end_src
+** saveplace mode
+#+begin_src emacs-lisp
+  (save-place-mode 1)
+#+end_src
+** auto-revert mode
+#+begin_src emacs-lisp
+  (global-auto-revert-mode 1)
+#+end_src
+** buffer when opening emacs
+#+begin_src emacs-lisp
+  (defun my-setup-initial-window-setup ()
+    "Do what I want for initial window setup.
+  In my case I want to start with 2 windows split side by side."
+    (interactive)
+    (switch-to-buffer (find-file "~/BeepBoop/Org/todo.org"))
+    (split-window-horizontally)
+    (other-window 1)
+    (switch-to-buffer (org-agenda nil "a")))
+
+  (add-hook 'emacs-startup-hook #'my-setup-initial-window-setup)
+#+end_src
 * Org mode
 ** General looking
 *** Org bullets
@@ -238,13 +270,17 @@ n* Org
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1))))
 #+end_src
+** Fuzzy for link to file
+#+begin_src emacs-lisp
+  (setq org-link-search-must-match-exact-headline nil)
+#+end_src
 ** Visual line mode
    #+begin_src emacs-lisp
      (add-hook 'org-mode-hook '(lambda () (visual-line-mode 1)))
    #+end_src
 
    #+RESULTS:
-
+   
 ** Agenda
 *** set agenda key
    #+begin_src emacs-lisp
@@ -252,10 +288,10 @@ n* Org
    #+end_src
 *** set agenda files
     #+begin_src emacs-lisp
-      (setq org-agenda-files '("/home/antoinem/BeepBoop/Org/todo.org"
-                               "/home/antoinem/BeepBoop/Org/work.org"
-                               "/home/antoinem/BeepBoop/Org/anniv.org"
-                               "/home/antoinem/BeepBoop/Org/livres.org"))
+      (setq org-agenda-files '("/home/amarie/BeepBoop/Org/todo.org"
+                               "/home/amarie/BeepBoop/Org/work.org"
+                               "/home/amarie/BeepBoop/Org/anniv.org"
+                               "/home/amarie/BeepBoop/Org/livres.org"))
     #+end_src
 *** compact agenda
 #+begin_src emacs-lisp
@@ -264,11 +300,11 @@ n* Org
   ;; Compact the block agenda view
   (setq org-agenda-compact-blocks t)
 #+end_src
-*** start agenda f rom today
+*** start agenda from today
 #+begin_src emacs-lisp
   (setq org-agenda-span 10
         org-agenda-start-on-weekday nil
-        org-agenda-start-day "-3d")
+        org-agenda-start-day "-0d")
 #+end_src
 *** org-habit
 #+begin_src emacs-lisp
@@ -276,6 +312,7 @@ n* Org
   (add-to-list 'org-modules 'org-habit)
   (setq org-habit-graph-column 40)
 #+end_src
+
 ** Key binding for todo.org
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c t") (lambda() (interactive)(find-file "~/BeepBoop/Org/todo.org")))
@@ -364,37 +401,23 @@ n* Org
              TeX-parse-self		 t
              TeX-PDF-mode		 t
              TeX-electric-escape	 t)
-       ;; Turn on RefTeX in AUCTeX
-       (setq reftex-plug-into-AUCTeX t)
-       (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-       ;; Reftex default bibfile
-       ;;(setq reftex-default-bibliography "~/Stage_M2/ESVCC/VpCCD/VpCCD.bib")
-       ;; Activate nice interface between RefTeX and AUCTeX
-       (setq reftex-plug-into-AUCTeX t)
        )        
    #+end_src
-
-** company
-#+begin_src emacs-lisp
-  ;; Completion
-  (use-package company-auctex
-    :ensure t
-    :after (company-auctex)
-    :init
-    (company-auctex-init))
-#+end_src
 ** auctex-latexmk
    #+begin_src emacs-lisp
      (use-package auctex-latexmk
        :ensure t
        :init
-       (auctex-latexmk-setup))
+       (auctex-latexmk-setup)
+       :config
+       (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+       )
    #+end_src
-   
-** PDF updated and open in PDF tools
+
+** PDF updated and open in Evince EE
    #+begin_src emacs-lisp
      ;; to use pdfview with auctex
-     (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+     (setq TeX-view-program-selection '((output-pdf "Evince"))
      TeX-source-correlate-start-server t) ;; not sure if last line is neccessary
      ;; to have the buffer refresh after compilation
      (add-hook 'TeX-after-compilation-finished-functions
@@ -402,16 +425,22 @@ n* Org
      ;;correlate
      (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
    #+end_src
-
 ** flyspell
 #+begin_src emacs-lisp
   (add-hook 'LaTeX-mode-hook 'flyspell-mode) 
 #+end_src
-** latex preview
+** reftex
 #+begin_src emacs-lisp
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-#+end_src
-
+     (use-package reftex
+       :ensure t
+       :config
+       (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+       ;; Reftex default bibfile
+       ;;(setq reftex-default-bibliography "~/Stage_M2/ESVCC/VpCCD/VpCCD.bib")
+       ;; Activate nice interface between RefTeX and AUCTeX
+       (setq reftex-plug-into-AUCTeX t)
+       )        
+   #+end_src
 * Magit
 Great tutorial to learn the very basics of [[https://www.youtube.com/watch?v=vQO7F2Q9DwA][magit]]. A more advanced series of tutorial on [[https://www.youtube.com/playlist?list=PLEoMzSkcN8oMc34dTjyFmTUWbXTKrNfZA][magit]].
 ** Magit package
@@ -419,19 +448,11 @@ Magit is a git porcelain for emacs.
 Reference card for [[https://magit.vc/manual/magit-refcard.pdf][magit]].
 #+begin_src emacs-lisp
   (use-package magit
+    :ensure t
     :bind
     ("C-x g" . magit-status)
     :config
     (setq ediff-window-setup-function 'ediff-setup-windows-plain))
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package git-gutter
-    :init
-    (global-git-gutter-mode))
-
-  (use-package git-gutter-fringe
-    :after git-gutter)
 #+end_src
 * Org roam
 I learned how to use org roam thanks to the following [[https://www.youtube.com/watch?v=AyhPmypHDEw&list=PLEoMzSkcN8oN3x3XaZQ-AXFKv52LZzjqD][series of tutorial]].
@@ -468,40 +489,41 @@ There is also a complete tutorial on how to install the minimum configuration fo
 #+end_src
 ** Capture templates
 #+begin_src emacs-lisp
+  (require 'ucs-normalize)
   (setq org-roam-capture-templates
               '(("e" "empty" plain "%?"
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("a" "notes on a research article" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Article.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/Article.org")
                  :if-new (file+head "${citekey}.org" "#+title: ${citekey}\n")
                  :unnarrowed t)
                 ("m" "notes on a method" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Method.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/Method.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("d" "definition or notes on a concept" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Definition_Concept.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/Definition_Concept.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("g" "general category to link other notes" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/General_category.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/General_category.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("t" "notes on a textbook" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Textbook.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/Textbook.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("l" "notes on lecture (notes)" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/LectureNotes.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/LectureNotes.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("p" "notes on a PhD manuscript" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/PhD.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/PhD.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)
                 ("c" "notes on a conference" plain
-                 (file "/home/antoinem/BeepBoop/OrgRoam/Templates/Conference.org")
+                 (file "/home/amarie/BeepBoop/OrgRoam/Templates/Conference.org")
                  :if-new (file+head "${slug}.org" "#+title: ${title}\n")
                  :unnarrowed t)))
 #+end_src
@@ -513,9 +535,9 @@ https://github.com/tmalsburg/helm-bibtex
        :ensure t
        )
      (setq bibtex-completion-bibliography
-           '("/home/antoinem/References/References.bib")
-           bibtex-completion-notes-path "/home/antoinem/BeepBoop/Org/bibtex_notes.org"
-           bibtex-completion-library-path '("/home/antoinem/References")
+           '("/home/amarie/References/References.bib")
+           bibtex-completion-notes-path "/home/amarie/BeepBoop/Org/bibtex_notes.org"
+           bibtex-completion-library-path '("/home/amarie/References")
            bibtex-completion-pdf-field "file")
      (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
    #+end_src
@@ -524,9 +546,9 @@ https://github.com/tmalsburg/helm-bibtex
   (use-package org-ref
     :ensure t
   )
-  (setq org-ref-bibliography-notes "/home/antoinem/BeepBoop/Org/ref_notes.org"
-        org-ref-default-bibliography '("/home/antoinem/References/References.bib")
-        org-ref-pdf-directory "/home/antoinem/References")
+  (setq org-ref-bibliography-notes "/home/amarie/BeepBoop/Org/ref_notes.org"
+        org-ref-default-bibliography '("/home/amarie/References/References.bib")
+        org-ref-pdf-directory "/home/amarie/References")
 #+end_src
 ** Org-roam-bibtex
 #+begin_src emacs-lisp
