@@ -11,19 +11,20 @@ I have also used pieces of other emacs config:
 * Theme
 Loading a nice looking theme
   #+begin_src emacs-lisp
-    (use-package doom-themes
-      :ensure t
-      :config
-      ;; Global settings (defaults)
-      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-	    doom-themes-enable-italic t) ; if nil, italics is universally disabled
-      (load-theme 'doom-molokai t)  ;;other cool themes doom-acario-dark doom-zenburn doom-gruvbox doom-snazzy doom-material
+        (use-package doom-themes
+          :ensure t
+          :config
+          ;; Global settings (defaults)
+          (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+                doom-themes-enable-italic t) ; if nil, italics is universally disabled
+          (load-theme 'doom-challenger-deep t)  ;;other cool themes doom-acario-dark doom-challenger-deep doom-snazzy doom-gruvbox doom-molokai
+          ;; old-themes doom-zenburn doom-material 
 
-      ;; Enable flashing mode-line on errors
-      (doom-themes-visual-bell-config)
+          ;; Enable flashing mode-line on errors
+          (doom-themes-visual-bell-config)
 
-      ;; Corrects (and improves) org-mode's native fontification.
-      (doom-themes-org-config))
+          ;; Corrects (and improves) org-mode's native fontification.
+          (doom-themes-org-config))
   #+end_src
 
 * Good looking emacs
@@ -36,11 +37,21 @@ Setting some general parameters
     (toggle-frame-maximized)
     (global-display-line-numbers-mode t)
     (setq inhibit-startup-message 't)
-    (setq org-hide-emphasis-markers nil) ;; to hide the *,=, or / markers
     (defalias 'yes-or-no-p 'y-or-n-p)
     (setq
          split-width-threshold 0
          split-height-threshold nil) ;; vertical split by default
+  #+end_src
+
+  #+RESULTS:
+** Monospace font
+ #+begin_src emacs-lisp
+      ;; Set default font
+   (set-face-attribute 'default nil
+                       :family "JetBrains Mono"
+                       :height 160
+                       :weight 'normal
+                       :width 'normal)
   #+end_src
 
   #+RESULTS:
@@ -53,7 +64,7 @@ Setting some general parameters
   #+begin_src emacs-lisp
   (setq scroll-conservatively 100)
   #+end_src
-** Highligh indent package
+** Highlight indent package
 Highlight the indents in the prog and TeX modes.
    #+begin_src emacs-lisp
      (use-package highlight-indent-guides
@@ -112,10 +123,10 @@ Remove all the minor mode in the bottom bar
         (diminish 'visual-line-mode)
         (diminish 'beacon-mode)
         (diminish 'rainbow-delimiters-mode)
-        (diminish 'flycheck-mode)
-        (diminish 'ivy-mode)
+;        (diminish 'flycheck-mode)
         (diminish 'company-mode))
 #+end_src
+
 * User friendly emacs
 ** Backups
 #+begin_src emacs-lisp
@@ -126,14 +137,6 @@ Remove all the minor mode in the bottom bar
 #+begin_src emacs-lisp
    (global-set-key (kbd "C-c e") (lambda() (interactive)(find-file "~/.emacs.d/config.org")))
 #+end_src
-** Which-key package
-Display all the possible commands if you forget the one that you want.
-   #+begin_src emacs-lisp
-     (use-package which-key
-     :ensure t
-     :init
-     (which-key-mode))
-   #+end_src
 ** Easily find cursor
 *** Highlight cursor line
   #+begin_src emacs-lisp
@@ -147,61 +150,18 @@ Make the cursor's line flash when switching window or buffer.
        :init
        (beacon-mode 1))
    #+end_src
-** Company
-Company provides auto-completion
-#+begin_src emacs-lisp
-  (use-package company
-    :ensure t
-    :config
-    (setq company-idle-delay 0)
-    (setq company-minimum-prefix-length 3)
-    :init
-    (add-hook 'after-init-hook 'global-company-mode))
-
-  (with-eval-after-load 'company
-    (define-key company-active-map (kbd "M-n") nil)
-    (define-key company-active-map (kbd "M-p") nil)
-    (define-key company-active-map (kbd "C-n") #'company-select-next)
-    (define-key company-active-map (kbd "C-p") #'company-select-previous))
-#+end_src
 ** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
-    :ensure t)
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
-** popup kill ring
+** Browse kill ring
    #+begin_src emacs-lisp
-     (use-package popup-kill-ring
-       :ensure t
-       :bind ("M-y" . popup-kill-ring))
-   #+end_src  
-** ivy package for auto-completion
-   #+begin_src emacs-lisp
-     (use-package counsel
-       :ensure t
-       :init (ivy-mode 1)
-       :config
-       (setq ivy-use-virtual-buffers t)
-       (setq enable-recursive-minibuffers t)
-       ;; enable this if you want `swiper' to use it
-       ;; (setq search-default-mode #'char-fold-to-regexp)
-       (global-set-key "\C-s" 'swiper)
-       (global-set-key (kbd "C-c C-r") 'ivy-resume)
-       (global-set-key (kbd "<f6>") 'ivy-resume)
-       (global-set-key (kbd "M-x") 'counsel-M-x)
-       (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-       (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-       (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-       (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
-       (global-set-key (kbd "<f1> l") 'counsel-find-library)
-       (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-       (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-       (global-set-key (kbd "C-c g") 'counsel-git)
-       (global-set-key (kbd "C-c j") 'counsel-git-grep)
-       (global-set-key (kbd "C-c k") 'counsel-ag)
-       (global-set-key (kbd "C-x l") 'counsel-locate)
-       (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-       (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+               (use-package browse-kill-ring  ; List of previous copy/cut
+                 :ensure t
+                 :bind (("M-y" . browse-kill-ring)))
    #+end_src
 ** Avy package
 Avy for fast moving to a character.
@@ -220,25 +180,89 @@ Avy for fast moving to a character.
 #+end_src
 ** saveplace mode
 #+begin_src emacs-lisp
-  (save-place-mode 1)
+  (save-place-mode 1) ; Remember the place in the file last time you closed that buffer
 #+end_src
 ** auto-revert mode
 #+begin_src emacs-lisp
-  (global-auto-revert-mode 1)
+  (global-auto-revert-mode 1) ; Automatically update buffer when file changes on disk
 #+end_src
-** buffer when opening emacs
+** ivy
 #+begin_src emacs-lisp
-  (defun my-setup-initial-window-setup ()
-    "Do what I want for initial window setup.
-  In my case I want to start with 2 windows split side by side."
-    (interactive)
-    (switch-to-buffer (find-file "~/BeepBoop/Org/todo.org"))
-    (split-window-horizontally)
-    (other-window 1)
-    (switch-to-buffer (org-agenda nil "a")))
-
-  (add-hook 'emacs-startup-hook #'my-setup-initial-window-setup)
+  (use-package counsel
+    :ensure t
+    :init (ivy-mode 1)
+    :config
+    (setq ivy-use-virtual-buffers t)
+    (setq enable-recursive-minibuffers t)
+    ;; enable this if you want `swiper' to use it
+    ;; (setq search-default-mode #'char-fold-to-regexp)
+    (global-set-key "\C-s" 'swiper)
+    (global-set-key (kbd "C-c C-r") 'ivy-resume)
+    (global-set-key (kbd "<f6>") 'ivy-resume)(setq lsp-tex-server 'digestif)
+    (global-set-key (kbd "M-x") 'counsel-M-x)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+    (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+    (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+    (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+    (global-set-key (kbd "<f1> l") 'counsel-find-library)
+    (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+    (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+    (global-set-key (kbd "C-c g") 'counsel-git)
+    (global-set-key (kbd "C-c j") 'counsel-git-grep)
+    (global-set-key (kbd "C-c k") 'counsel-ag)
+    (global-set-key (kbd "C-x l") 'counsel-locate)
+    (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 #+end_src
+
+** SOMEDAY Corfu
+#    #+begin_src emacs-lisp
+     
+#    #+end_src
+
+** SOMEDAY Vertico
+#    #+begin_src emacs-lisp
+#      (use-package vertico
+#        :ensure t
+#        :init
+#        (vertico-mode))
+#    #+end_src
+
+#    #+RESULTS:
+   
+# ** Marginalia
+#    #+begin_src emacs-lisp
+#      (use-package marginalia
+#        :after vertico
+#        :ensure t
+#        :custom
+#        (marginalia-max-relative-age 0)
+#        (marginalia-align 'right)
+#        (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+#        :init
+#        (marginalia-mode))
+#    #+end_src
+
+# ** Orderless
+#    #+begin_src emacs-lisp
+#      (use-package orderless
+#        :ensure t
+#        :custom
+#        (completion-styles '(orderless)))
+#    #+end_src
+
+#    #+RESULTS:
+#    : t
+
+** Which-key package
+Display all the possible commands if you forget the one that you want.
+   #+begin_src emacs-lisp
+     (use-package which-key
+     :ensure t
+     :init
+     (which-key-mode))
+   #+end_src
+
 * Org mode
 ** General looking
 *** Org bullets
@@ -278,45 +302,9 @@ Avy for fast moving to a character.
    #+begin_src emacs-lisp
      (add-hook 'org-mode-hook '(lambda () (visual-line-mode 1)))
    #+end_src
-
-   #+RESULTS:
-   
-** Agenda
-*** set agenda key
-   #+begin_src emacs-lisp
-      (global-set-key (kbd "C-c a") 'org-agenda)
-   #+end_src
-*** set agenda files
-    #+begin_src emacs-lisp
-      (setq org-agenda-files '("/home/amarie/BeepBoop/Org/todo.org"
-                               "/home/amarie/BeepBoop/Org/work.org"
-                               "/home/amarie/BeepBoop/Org/anniv.org"
-                               "/home/amarie/BeepBoop/Org/livres.org"))
-    #+end_src
-*** compact agenda
-#+begin_src emacs-lisp
-  ;; Do not dim blocked tasks
-  (setq org-agenda-dim-blocked-tasks nil)
-  ;; Compact the block agenda view
-  (setq org-agenda-compact-blocks t)
-#+end_src
-*** start agenda from today
-#+begin_src emacs-lisp
-  (setq org-agenda-span 10
-        org-agenda-start-on-weekday nil
-        org-agenda-start-day "-0d")
-#+end_src
-*** org-habit
-#+begin_src emacs-lisp
-  (require 'org-habit)
-  (add-to-list 'org-modules 'org-habit)
-  (setq org-habit-graph-column 40)
-#+end_src
-
 ** Key binding for todo.org
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c t") (lambda() (interactive)(find-file "~/BeepBoop/Org/todo.org")))
-  (global-set-key (kbd "C-c w") (lambda() (interactive)(find-file "~/BeepBoop/Org/work.org")))
+  (global-set-key (kbd "C-c t") (lambda() (interactive)(find-file "~/Dropbox/Org/todo.org")))
 #+end_src
 ** Org TODO keywords and priorities
    #+begin_src emacs-lisp
@@ -341,14 +329,14 @@ Avy for fast moving to a character.
 *** todo template
     #+begin_src emacs-lisp
       (setq org-capture-templates
-            '(("t" "todo" entry (file+headline "~/BeepBoop/Org/todo.org" "Tasks")
+            '(("t" "todo" entry (file+headline "~/Dropbox/Org/todo.org" "Tasks")
                "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n"  :prepend t :kill-buffer t)))
     #+end_src
 
 *** idea template
     #+begin_src emacs-lisp
       (setq org-capture-templates
-            '(("i" "Idea" entry (file+headline "~/BeepBoop/Org/todo.org" "Task")
+            '(("i" "Idea" entry (file+headline "~/Dropbox/Org/todo.org" "Task")
                "* IDEA %?\nAdded: %U\n" :prepend t :kill-buffer t)))
     #+end_src
     
@@ -382,27 +370,28 @@ Avy for fast moving to a character.
        ("email" . ?e)
        ("idea" . ?i)))
 #+end_src
-** TODO org-wild-notifier for notifications for agenda 
 ** Host local server with simple-httpd
 #+begin_src emacs-lisp
   (use-package simple-httpd
     :ensure t)
 #+end_src
 * AucTeX
-** install
+** auctex
    #+begin_src emacs-lisp
      (use-package auctex
        :ensure t
-       :mode ("\\.tex\\'" . TeX-latex-mode)
-       :config
-       ;; General configs
-       (setq TeX-master		 nil
-             TeX-auto-save		 t
-             TeX-parse-self		 t
-             TeX-PDF-mode		 t
-             TeX-electric-escape	 t)
-       )        
-   #+end_src
+       :mode ("\\.tex\\'" . tex-mode)
+       :mode ("\\.rty\\'" . tex-mode)
+       :mode ("\\.bib\\'" . bibtex-mode)
+       :init
+       (setq TeX-master              nil
+             TeX-auto-save		 t  ; enable autosave on during LaTeX-mode
+             TeX-parse-self		 t  ; enable autoparsing
+             TeX-PDF-mode		 t  ; to create pdf by default
+             TeX-electric-escape	 t
+             TeX-engine           'luatex)
+       )
+   #+end_src 
 ** auctex-latexmk
    #+begin_src emacs-lisp
      (use-package auctex-latexmk
@@ -413,7 +402,6 @@ Avy for fast moving to a character.
        (setq auctex-latexmk-inherit-TeX-PDF-mode t)
        )
    #+end_src
-
 ** PDF updated and open in Evince EE
    #+begin_src emacs-lisp
      ;; to use pdfview with auctex
@@ -431,16 +419,35 @@ Avy for fast moving to a character.
 #+end_src
 ** reftex
 #+begin_src emacs-lisp
-     (use-package reftex
-       :ensure t
-       :config
-       (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-       ;; Reftex default bibfile
-       ;;(setq reftex-default-bibliography "~/Stage_M2/ESVCC/VpCCD/VpCCD.bib")
-       ;; Activate nice interface between RefTeX and AUCTeX
-       (setq reftex-plug-into-AUCTeX t)
-       )        
+  (use-package reftex
+    :ensure t
+    :config
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+    ;; Reftex default bibfile
+    (setq reftex-plug-into-AUCTeX t
+          reftex-insert-label-flags '("s" t))
+    )        
    #+end_src
+** lsp-latex
+#+begin_src emacs-lisp
+  (use-package lsp-latex
+    :ensure t
+    :config
+    (add-hook 'tex-mode-hook 'lsp)
+    (add-hook 'latex-mode-hook 'lsp)
+    )
+  (setq lsp-tex-server 'digestif)
+   #+end_src
+
+   #+RESULTS:
+   : digestif
+
+** remove fontification
+#+begin_src emacs-lisp
+  (setq font-latex-fontify-script nil)
+  (setq font-latex-fontify-sectioning 'color)       
+#+end_src
+
 * Magit
 Great tutorial to learn the very basics of [[https://www.youtube.com/watch?v=vQO7F2Q9DwA][magit]]. A more advanced series of tutorial on [[https://www.youtube.com/playlist?list=PLEoMzSkcN8oMc34dTjyFmTUWbXTKrNfZA][magit]].
 ** Magit package
@@ -528,19 +535,6 @@ There is also a complete tutorial on how to install the minimum configuration fo
                  :unnarrowed t)))
 #+end_src
 
-** TODO [#C] Advanced configuration ivy-bibtex
-https://github.com/tmalsburg/helm-bibtex
-   #+begin_src emacs-lisp
-     (use-package ivy-bibtex
-       :ensure t
-       )
-     (setq bibtex-completion-bibliography
-           '("/home/amarie/References/References.bib")
-           bibtex-completion-notes-path "/home/amarie/BeepBoop/Org/bibtex_notes.org"
-           bibtex-completion-library-path '("/home/amarie/References")
-           bibtex-completion-pdf-field "file")
-     (setq ivy-bibtex-default-action 'ivy-bibtex-insert-citation)
-   #+end_src
 ** Org-ref
 #+begin_src emacs-lisp
   (use-package org-ref
@@ -559,4 +553,122 @@ https://github.com/tmalsburg/helm-bibtex
     :bind (:map org-mode-map
                 (("C-c n a" . orb-note-actions))))
   (setq orb-preformat-keywords '("citekey" "author" "year" "doi" "journal" "file"))
+#+end_src
+* Rust
+** install
+   #+begin_src emacs-lisp
+     (use-package rust-mode
+       :ensure t
+       )        
+   #+end_src
+** rustic
+   #+begin_src emacs-lisp
+     (use-package rustic
+       :ensure
+       :bind (:map rustic-mode-map
+                   ("M-j" . lsp-ui-imenu)
+                   ("M-?" . lsp-find-references)
+                   ("C-c C-c l" . flycheck-list-errors)
+                   ("C-c C-c a" . lsp-execute-code-action)
+                   ("C-c C-c r" . lsp-rename)
+                   ("C-c C-c q" . lsp-workspace-restart)
+                   ("C-c C-c Q" . lsp-workspace-shutdown)
+                   ("C-c C-c s" . lsp-rust-analyzer-status))
+       :config
+       ;; uncomment for less flashiness
+       ;; (setq lsp-eldoc-hook nil)
+       ;; (setq lsp-enable-symbol-highlighting nil)
+       ;; (setq lsp-signature-auto-activate nil)
+
+       ;; comment to disable rustfmt on save
+       (setq rustic-format-on-save t)
+       (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+     (defun rk/rustic-mode-hook ()
+       ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+       ;; save rust buffers that are not file visiting. Once
+       ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+       ;; no longer be necessary.
+       (when buffer-file-name
+         (setq-local buffer-save-without-query t))
+       (add-hook 'before-save-hook 'lsp-format-buffer nil t))
+   #+end_src
+** rust-analyzer
+   #+begin_src emacs-lisp
+     (use-package lsp-mode
+       :ensure
+       :commands lsp
+       :custom
+       ;; what to use when checking on-save. "check" is default, I prefer clippy
+       (lsp-rust-analyzer-cargo-watch-command "clippy")
+       (lsp-eldoc-render-all t)
+       (lsp-idle-delay 0.6)
+       ;; enable / disable the hints as you prefer:
+       (lsp-inlay-hint-enable t)
+       ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
+       (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+       (lsp-rust-analyzer-display-chaining-hints t)
+       (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+       (lsp-rust-analyzer-display-closure-return-type-hints t)
+       (lsp-rust-analyzer-display-parameter-hints nil)
+       (lsp-rust-analyzer-display-reborrow-hints nil)
+       :config
+       (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+     (use-package lsp-ui
+       :ensure
+       :commands lsp-ui-mode
+       :custom
+       (lsp-ui-peek-always-show t)
+       (lsp-ui-sideline-show-hover t)
+       (lsp-ui-doc-enable nil))     
+   #+end_src
+** company
+   #+begin_src emacs-lisp
+     (use-package company
+       :ensure
+       :custom
+       (company-idle-delay 0.5) ;; how long to wait until popup
+       ;; (company-begin-commands nil) ;; uncomment to disable popup
+       :bind
+       (:map company-active-map
+             ("C-n". company-select-next)
+             ("C-p". company-select-previous)
+             ("M-<". company-select-first)
+             ("M->". company-select-last)))
+
+     (use-package yasnippet
+       :ensure
+       :config
+       (yas-reload-all)
+       (add-hook 'prog-mode-hook 'yas-minor-mode)
+       (add-hook 'text-mode-hook 'yas-minor-mode))
+
+     (yas-global-mode 1)
+   #+end_src
+** indent
+   #+begin_src emacs-lisp
+     (add-hook 'rust-mode-hook
+              (lambda () (setq indent-tabs-mode nil)))
+   #+end_src
+** rust formating
+#+begin_src emacs-lisp
+  (setq rust-format-on-save t)
+#+end_src
+* Python
+#+begin_src emacs-lisp
+    (use-package elpy
+      :ensure t
+      )
+#+end_src
+* Fortran
+#+begin_src emacs-lisp
+  (use-package f90
+    :ensure t
+    :mode ("\\.f90\\'" . f90-mode)
+    :mode ("\\.irp.f\\'" . f90-mode)
+    :init
+    (setq fortran-minimum-statement-indent-fixed 2)
+       )
+   #+end_src
 #+end_src

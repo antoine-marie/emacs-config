@@ -33,10 +33,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(auth-source-save-behavior nil)
- '(org-agenda-files
-   '("/home/amarie/BeepBoop/Org/todo.org" "/home/amarie/BeepBoop/Org/anniv.org" "/home/amarie/BeepBoop/Org/livres.org"))
+ '(ispell-dictionary nil)
+ '(org-scheduled-past-days 1000)
  '(package-selected-packages
-   '(org simple-httpd org-roam-bibtex git-gutter-fringe git-gutter magit company-auctex popup-kill-ring doom-themes zenburn-theme rainbow-delimiters auctex-latexmk avy beacon darkburn-theme which-key use-package))
+   '(browse-kill-ring lsp-latex consult org-roam-bibtex git-gutter-fringe git-gutter company-auctex zenburn-theme darkburn-theme use-package))
  '(warning-suppress-types '((comp) (use-package) (:warning))))
 
 (custom-set-faces
@@ -46,3 +46,4 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 160 :width normal :foundry "1ASC" :family "xos4 Terminus"))))
  '(fringe ((t (:background "#292b2e")))))
+(put 'narrow-to-region 'disabled nil)
